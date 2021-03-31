@@ -1,0 +1,76 @@
+version: '3'
+services:
+  mysql-app:
+    build: ./mysql
+    command: --innodb-use-native-aio=0
+    restart: always
+    tty: true
+    hostname: mysql
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql/var/lib/mysql:/var/lib/mysql
+    #environment:
+      #MYSQL_DATABASE: db-name
+     # MYSQL_ROOT_PASSWORD: admin
+    networks:
+      - dev-network
+  mongo-app:
+    build: ./mongo
+    hostname: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    #environment:
+    #  MONGO_INITDB_ROOT_USERNAME: root
+    #  MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - ./data/mongo/data/db:/data/db
+     # - ./data/etc:/etc/mongod.conf
+    networks:
+      - dev-network
+  postgress-app:
+    build: ./postgres
+    restart: always
+    tty: true
+    hostname: postgres
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres/var/lib/postgresql/data:/var/lib/postgresql/data
+    #environment:
+    #  POSTGRES_USER: postgres
+    #  POSTGRES_PASSWORD: docker
+    networks:
+      - dev-network
+  redis-app:
+    build: ./redis
+    hostname: redis
+    container_name: redis
+    volumes:
+      - ./data/redis/data:/data/db
+    ports:
+      - "6379:6379"
+    networks:
+      - dev-network
+  rabbitmq-app:
+      build: ./rabbitmq
+      hostname: rabbitmq
+      container_name: rabbitmq
+      volumes:
+        - ./data/rabbitmq/var/lib/rabbitmq/mnesia:/var/lib/rabbitmq/mnesia
+      ports:
+        - "15672:15672"
+        - "5672:5672"
+      networks:
+        - dev-network
+      environment:
+        RABBITMQ_DEFAULT_USER: admin
+        RABBITMQ_DEFAULT_PASS: admin
+        RABBITMQ_DEFAULT_VHOST: rabbitmq.local
+networks:
+  dev-network:
+    driver: bridge
+
